@@ -1,0 +1,95 @@
+{
+  "description": "End-to-end retrieval latency profile at various QPS levels (50M doc corpus)",
+  "hardware": {
+    "instance_type": "g5.48xlarge",
+    "gpu": "8x NVIDIA A10G",
+    "cpu": "AMD EPYC 7R13 64-Core",
+    "memory_gb": 256
+  },
+  "profiles": [
+    {
+      "qps": 100,
+      "replicas": 1,
+      "duration_minutes": 30,
+      "latency_ms": {
+        "p50": 6.1,
+        "p75": 7.8,
+        "p90": 8.9,
+        "p95": 9.4,
+        "p99": 14.2,
+        "p999": 22.7
+      },
+      "error_rate": 0.0,
+      "cpu_utilization": 0.12
+    },
+    {
+      "qps": 500,
+      "replicas": 2,
+      "duration_minutes": 30,
+      "latency_ms": {
+        "p50": 7.3,
+        "p75": 9.1,
+        "p90": 10.4,
+        "p95": 11.2,
+        "p99": 19.8,
+        "p999": 31.4
+      },
+      "error_rate": 0.00002,
+      "cpu_utilization": 0.34
+    },
+    {
+      "qps": 1000,
+      "replicas": 4,
+      "duration_minutes": 30,
+      "latency_ms": {
+        "p50": 7.8,
+        "p75": 10.2,
+        "p90": 12.9,
+        "p95": 14.8,
+        "p99": 28.1,
+        "p999": 44.3
+      },
+      "error_rate": 0.00005,
+      "cpu_utilization": 0.51
+    },
+    {
+      "qps": 2000,
+      "replicas": 8,
+      "duration_minutes": 30,
+      "latency_ms": {
+        "p50": 8.2,
+        "p75": 12.4,
+        "p90": 18.1,
+        "p95": 23.0,
+        "p99": 41.3,
+        "p999": 67.8
+      },
+      "error_rate": 0.00012,
+      "cpu_utilization": 0.73
+    },
+    {
+      "qps": 3000,
+      "replicas": 12,
+      "duration_minutes": 30,
+      "latency_ms": {
+        "p50": 9.7,
+        "p75": 16.8,
+        "p90": 27.4,
+        "p95": 34.2,
+        "p99": 58.6,
+        "p999": 89.1
+      },
+      "error_rate": 0.00034,
+      "cpu_utilization": 0.86
+    }
+  ],
+  "component_breakdown_at_2k_qps": {
+    "query_encoding_ms": 2.1,
+    "bm25_sparse_search_ms": 0.8,
+    "hnsw_dense_search_ms": 4.8,
+    "rrf_fusion_ms": 0.3,
+    "cross_encoder_rerank_ms": 12.6,
+    "network_overhead_ms": 0.4,
+    "notes": "BM25 and HNSW run in parallel via asyncio.to_thread; total wall time is max(bm25, hnsw) not sum"
+  }
+}

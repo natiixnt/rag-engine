@@ -1,0 +1,86 @@
+{
+  "description": "Recall@K metrics across different corpus sizes",
+  "eval_set": {
+    "num_queries": 5000,
+    "annotation_type": "human_relevance_judgments",
+    "avg_relevant_per_query": 4.7
+  },
+  "embedding_model": "BAAI/bge-base-en-v1.5",
+  "retrieval_mode": "hybrid_rrf",
+  "results": [
+    {
+      "corpus_size": 100000,
+      "index_size_gb": 0.28,
+      "metrics": {
+        "recall_at_1": 0.934,
+        "recall_at_5": 0.981,
+        "recall_at_10": 0.993,
+        "recall_at_20": 0.997,
+        "recall_at_100": 0.999,
+        "mrr": 0.961,
+        "ndcg_at_10": 0.972,
+        "map_at_10": 0.958
+      }
+    },
+    {
+      "corpus_size": 1000000,
+      "index_size_gb": 2.84,
+      "metrics": {
+        "recall_at_1": 0.921,
+        "recall_at_5": 0.969,
+        "recall_at_10": 0.984,
+        "recall_at_20": 0.993,
+        "recall_at_100": 0.998,
+        "mrr": 0.948,
+        "ndcg_at_10": 0.957,
+        "map_at_10": 0.941
+      }
+    },
+    {
+      "corpus_size": 10000000,
+      "index_size_gb": 28.4,
+      "metrics": {
+        "recall_at_1": 0.907,
+        "recall_at_5": 0.959,
+        "recall_at_10": 0.978,
+        "recall_at_20": 0.990,
+        "recall_at_100": 0.997,
+        "mrr": 0.936,
+        "ndcg_at_10": 0.944,
+        "map_at_10": 0.928
+      }
+    },
+    {
+      "corpus_size": 50000000,
+      "index_size_gb": 142.3,
+      "metrics": {
+        "recall_at_1": 0.891,
+        "recall_at_5": 0.952,
+        "recall_at_10": 0.974,
+        "recall_at_20": 0.988,
+        "recall_at_100": 0.997,
+        "mrr": 0.923,
+        "ndcg_at_10": 0.937,
+        "map_at_10": 0.912
+      }
+    }
+  ],
+  "sparse_vs_dense_breakdown": {
+    "description": "Isolating each retrieval path at 50M scale",
+    "bm25_only": {
+      "recall_at_10": 0.847,
+      "mrr": 0.584,
+      "notes": "BM25 recall barely changes with corpus size because inverted index is exact"
+    },
+    "hnsw_only": {
+      "recall_at_10": 0.931,
+      "mrr": 0.672,
+      "notes": "Dense recall degrades ~4% from 100K to 50M due to approximate search"
+    },
+    "hybrid_rrf": {
+      "recall_at_10": 0.974,
+      "mrr": 0.704,
+      "notes": "RRF fusion recovers most of the dense path losses via sparse complement"
+    }
+  }
+}

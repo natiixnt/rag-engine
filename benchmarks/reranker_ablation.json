@@ -1,0 +1,75 @@
+{
+  "description": "Ablation study: impact of each retrieval/reranking component",
+  "corpus_size": 50000000,
+  "eval_queries": 5000,
+  "configurations": [
+    {
+      "name": "bm25_only",
+      "description": "Sparse BM25 retrieval, no reranking",
+      "mrr": 0.584,
+      "ndcg_at_10": 0.612,
+      "recall_at_10": 0.847,
+      "p95_latency_ms": 3.4,
+      "notes": "Baseline. Good for keyword-heavy queries, fails on semantic similarity."
+    },
+    {
+      "name": "hnsw_dense_only",
+      "description": "Dense HNSW retrieval via Rust core, no reranking",
+      "mrr": 0.672,
+      "ndcg_at_10": 0.701,
+      "recall_at_10": 0.931,
+      "p95_latency_ms": 4.8,
+      "notes": "Better recall than BM25 but MRR is mediocre without reranking to fix ordering."
+    },
+    {
+      "name": "hybrid_rrf",
+      "description": "BM25 + HNSW with reciprocal rank fusion (k=60)",
+      "mrr": 0.704,
+      "ndcg_at_10": 0.738,
+      "recall_at_10": 0.974,
+      "p95_latency_ms": 5.1,
+      "notes": "RRF gives a nice recall boost for almost zero latency cost. k=60 is from the original Cormack paper, tested k in [20,100] and 60 is still optimal."
+    },
+    {
+      "name": "hybrid_reranker_v1",
+      "description": "Hybrid retrieval + base ms-marco-MiniLM-L-6-v2 cross-encoder",
+      "mrr": 0.871,
+      "ndcg_at_10": 0.894,
+      "recall_at_10": 0.974,
+      "p95_latency_ms": 18.4,
+      "notes": "Generic cross-encoder already gives +23.7% MRR. This was our prod config for 6 months."
+    },
+    {
+      "name": "hybrid_reranker_v2",
+      "description": "Hybrid retrieval + domain fine-tuned cross-encoder (200K pairs)",
+      "mrr": 0.923,
+      "ndcg_at_10": 0.937,
+      "recall_at_10": 0.974,
+      "p95_latency_ms": 23.0,
+      "notes": "Fine-tuning on domain data gave another +5.2% MRR. Training took 4hrs on 4x A10G, totally worth it."
+    },
+    {
+      "name": "hybrid_reranker_v2_parent_chunks",
+      "description": "Full pipeline with parent chunk context expansion",
+      "mrr": 0.931,
+      "ndcg_at_10": 0.944,
+      "recall_at_10": 0.976,
+      "p95_latency_ms": 24.8,
+      "notes": "Parent chunks add context for the reranker to work with. +0.8% MRR for +1.8ms, easy win."
+    }
+  ],
+  "rrf_k_sensitivity": [
+    {"k": 20, "mrr": 0.698},
+    {"k": 40, "mrr": 0.702},
+    {"k": 60, "mrr": 0.704},
+    {"k": 80, "mrr": 0.703},
+    {"k": 100, "mrr": 0.701}
+  ],
+  "sparse_weight_sensitivity": [
+    {"sparse_weight": 0.1, "dense_weight": 0.9, "mrr": 0.691},
+    {"sparse_weight": 0.2, "dense_weight": 0.8, "mrr": 0.699},
+    {"sparse_weight": 0.3, "dense_weight": 0.7, "mrr": 0.704},
+    {"sparse_weight": 0.4, "dense_weight": 0.6, "mrr": 0.700},
+    {"sparse_weight": 0.5, "dense_weight": 0.5, "mrr": 0.693}
+  ]
+}

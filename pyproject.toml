@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-engine"
+version = "0.5.0"
+description = "Production RAG engine with hybrid BM25+HNSW retrieval and cross-encoder reranking"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "natiixnt"},
+]
+
+dependencies = [
+    "numpy>=1.24,<2.0",
+    "onnxruntime>=1.16.0",
+    "pgvector>=0.2.3",
+    "psycopg[binary]>=3.1",
+    "sentence-transformers>=2.2.2",
+    "tokenizers>=0.15.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "structlog>=23.2.0",
+    "tenacity>=8.2.0",
+    "rank-bm25>=0.2.2",
+    "scipy>=1.11.0",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.23",
+    "pytest-benchmark>=4.0",
+    "ruff>=0.1.6",
+    "mypy>=1.7",
+    "ragas>=0.1.1",
+    "datasets>=2.15",
+]
+
+gpu = [
+    "onnxruntime-gpu>=1.16.0",
+]
+
+[project.scripts]
+rag-engine = "rag_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "ANN", "B", "A", "SIM"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
